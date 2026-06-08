@@ -3,86 +3,59 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Tournament Predictor V1</title>
+  <title>WK Predictor</title>
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-  <header class="topbar">
-    <div>
-      <h1>🏆 Tournament Predictor</h1>
-      <p>GitHub Pages V1: API-key in browser + Polymarket + Elo + Poisson + Monte Carlo</p>
-    </div>
-    <button id="settingsBtn" class="secondary">⚙️ Instellingen</button>
+  <header>
+    <h1>WK Predictor</h1>
+    <p>API-Football + Elo + Poisson + Monte Carlo</p>
   </header>
 
   <main>
-    <section id="settingsPanel" class="card hidden">
-      <h2>Instellingen</h2>
-      <p class="hint">API-keys worden alleen in localStorage van deze browser opgeslagen. Ze staan dus niet in je GitHub repo.</p>
-      <div class="grid two">
-        <label>Football-Data.org API key
-          <input id="footballDataKey" type="password" placeholder="optioneel, voor echte fixtures" />
-        </label>
-        <label>Polymarket zoeken
-          <input id="polymarketQuery" type="text" value="world cup 2026" />
-        </label>
-        <label>Polymarket gewicht
-          <input id="polyWeight" type="number" min="0" max="1" step="0.05" value="0.50" />
-        </label>
-        <label>Elo gewicht
-          <input id="eloWeight" type="number" min="0" max="1" step="0.05" value="0.30" />
-        </label>
-        <label>Vormfactor gewicht
-          <input id="formWeight" type="number" min="0" max="1" step="0.05" value="0.20" />
-        </label>
-        <label>Monte Carlo simulaties
-          <input id="simulations" type="number" min="100" max="50000" step="100" value="10000" />
-        </label>
+    <section class="card grid">
+      <div>
+        <label>API-Football key</label>
+        <input id="apiKey" type="password" placeholder="x-apisports-key" autocomplete="off" />
+      </div>
+      <div>
+        <label>Toernooi</label>
+        <select id="tournament">
+          <option value="1:2026">FIFA World Cup 2026</option>
+          <option value="4:2024">Euro 2024</option>
+          <option value="2:2025">UEFA Champions League 2025</option>
+        </select>
+      </div>
+      <div>
+        <label>Simulaties</label>
+        <input id="simulations" type="number" min="100" max="50000" step="100" value="10000" />
       </div>
       <div class="actions">
-        <button id="saveSettings">Opslaan</button>
-        <button id="clearSettings" class="danger">Wis opgeslagen keys</button>
+        <button id="saveBtn">Opslaan</button>
+        <button id="runBtn">Genereer voorspelling</button>
       </div>
     </section>
 
-    <section class="card">
-      <div class="grid two">
-        <label>Toernooi
-          <select id="competition">
-            <option value="WC">WK 2026 / World Cup</option>
-            <option value="EC">EK / European Championship</option>
-          </select>
-        </label>
-        <label>Seizoen
-          <input id="season" type="number" value="2026" />
-        </label>
-      </div>
-      <div class="actions">
-        <button id="runBtn">Genereer voorspelling</button>
-        <button id="demoBtn" class="secondary">Gebruik demo-data</button>
-      </div>
-      <p id="status" class="status">Klaar.</p>
-    </section>
+    <section id="status" class="status">Vul je API-key in en klik op opslaan.</section>
 
     <section class="tabs">
-      <button class="tab active" data-tab="matches">Wedstrijden</button>
-      <button class="tab" data-tab="groups">Groepen</button>
-      <button class="tab" data-tab="knockout">Knock-out</button>
-      <button class="tab" data-tab="odds">Kampioenskansen</button>
-      <button class="tab" data-tab="debug">Debug</button>
+      <button data-tab="fixtures" class="active">Wedstrijden</button>
+      <button data-tab="groups">Groepen</button>
+      <button data-tab="chances">Kansen</button>
+      <button data-tab="debug">Debug</button>
     </section>
 
-    <section id="matches" class="card tabpage"></section>
-    <section id="groups" class="card tabpage hidden"></section>
-    <section id="knockout" class="card tabpage hidden"></section>
-    <section id="odds" class="card tabpage hidden"></section>
-    <section id="debug" class="card tabpage hidden"></section>
+    <section id="fixtures" class="panel active"></section>
+    <section id="groups" class="panel"></section>
+    <section id="chances" class="panel"></section>
+    <section id="debug" class="panel"></section>
   </main>
 
   <footer>
-    <p>Model: markt/Polymarket + Elo + vormfactor → expected goals → Poisson → Monte Carlo.</p>
+    <small>Keys worden alleen in jouw browser opgeslagen via localStorage.</small>
   </footer>
 
+  <script src="elo.js"></script>
   <script src="app.js"></script>
 </body>
 </html>
