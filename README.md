@@ -29,3 +29,22 @@ En probeert outcomes te matchen met teams in data/world-cup-2026.json.
 - Toont expliciet N/A bij ontbrekende Polymarket-data.
 - Probeert ook wedstrijdmarkten te herkennen.
 - Tab Polymarket bevat per groepswedstrijd marktstatus en prijzen indien beschikbaar.
+
+## V6
+
+- Geen automatische berekening bij eerste paginalaad.
+- Eerst API-key invullen, daarna handmatig op Genereer klikken.
+- Genereer-knop wordt disabled tijdens berekenen.
+- Standaard simulaties verlaagd naar 1000 voor snelle start.
+
+
+## V7
+
+- SportDB direct-call uit browser uitgezet; dit gaf CORS.
+- Gebruik optioneel `sportdb-worker.js` als Cloudflare Worker proxy.
+- De app vraagt nu om SportDB API-key + SportDB proxy URL.
+- Groepswedstrijden tonen nu ook:
+  - expected goals
+  - modelkansen 1/X/2
+  - exacte score
+- De exacte score is de meest waarschijnlijke losse score, niet de gemiddelde uitkomst.
