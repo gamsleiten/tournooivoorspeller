@@ -1,15 +1,31 @@
-# WK 2026 Predictor V2
+# WK 2026 Predictor V4
 
-GitHub Pages app met lokale WK 2026 JSON, Elo, baseline/projected standings en optionele SportSRC live data.
+GitHub Pages app met:
+- lokale WK 2026 JSON
+- lokale Elo ratings
+- SportDB live data via hardcoded endpoint
+- Polymarket Gamma markets voor toernooiwinstkansen
+- baseline / werkelijk / projected standen
+- baseline en live/projected kampioenskansen
 
-Upload alleen deze bestanden:
-- index.html
-- app.js
-- styles.css
-- .nojekyll
-- data/world-cup-2026.json
-- data/elo.json
+## Upload
+Wis je repo en upload alleen de inhoud van deze ZIP.
 
-SportSRC is optioneel. Vul in de UI je API-key en endpoint in. Als SportSRC velden niet levert, blijven ze leeg. Als de API faalt, blijft de voorspeller werken op lokale JSON + Elo.
+## SportDB
+Vul je SportDB API-key in. Endpoint staat hardcoded:
+https://api.sportdb.dev/api/flashscore/football
 
-Let op: WK 2026 data bevat placeholders en kan in data/world-cup-2026.json worden aangepast zodra teams/schema definitief zijn.
+## Polymarket
+Geen API-key nodig. Vul een zoekterm in, bijvoorbeeld:
+world cup 2026 winner
+
+De app zoekt via:
+https://gamma-api.polymarket.com/markets
+
+En probeert outcomes te matchen met teams in data/world-cup-2026.json.
+
+## V5
+
+- Toont expliciet N/A bij ontbrekende Polymarket-data.
+- Probeert ook wedstrijdmarkten te herkennen.
+- Tab Polymarket bevat per groepswedstrijd marktstatus en prijzen indien beschikbaar.
