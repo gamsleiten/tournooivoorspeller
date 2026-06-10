@@ -48,3 +48,15 @@ En probeert outcomes te matchen met teams in data/world-cup-2026.json.
   - modelkansen 1/X/2
   - exacte score
 - De exacte score is de meest waarschijnlijke losse score, niet de gemiddelde uitkomst.
+
+
+## V8
+
+- Scoremodus toegevoegd:
+  - Meest waarschijnlijk
+  - Afgeronde xG
+  - Realistische variant
+- Variant seed toegevoegd, zodat de realistische variant stabiel blijft.
+- Polymarket modus toegevoegd:
+  - Search
+  - Exact slug
