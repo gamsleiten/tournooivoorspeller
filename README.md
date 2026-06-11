@@ -65,3 +65,9 @@ En probeert outcomes te matchen met teams in data/world-cup-2026.json.
 ## V8.1
 
 Fix voor ontbrekende velden/cache: app crasht niet meer als browser nog oude HTML/controls heeft.
+
+
+## V8.2
+
+- Scoremodus staat nu gegarandeerd zichtbaar in de controls bovenaan.
+- Header toont V8.2 zodat je ziet dat GitHub Pages de juiste versie serveert.

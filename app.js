@@ -256,7 +256,7 @@ async function run(){
     renderChances(mb,mp);
     renderMarkets();
     renderData();
-    status(`Klaar. Simulaties: ${n}.`);
+    status(`Klaar. Simulaties: ${n}. Scoremodus: ${getVal("#scoreMode","likely")}.`);
   }catch(e){
     qs("#summary").innerHTML=`<div class=error><b>Fout:</b> ${e.message}</div>`;
   }finally{
