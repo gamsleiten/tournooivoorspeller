@@ -2,12 +2,33 @@
 const SPORTDB_URL="https://api.sportdb.dev/api/flashscore/football"; // Direct browser calls are usually blocked by CORS. Use a proxy URL.
 const POLY_URL="https://gamma-api.polymarket.com/markets";
 const qs=s=>document.querySelector(s),qsa=s=>Array.from(document.querySelectorAll(s)),pct=x=>`${(100*x).toFixed(1)}%`;
+function setVal(sel,val){const el=qs(sel);if(el)el.value=val;}
+function getVal(sel,fallback=''){const el=qs(sel);return el?el.value:fallback;}
 let tournament,elo,liveMatches={},polyMarkets=[],polyTeamPrices={},polyMatchMarkets={},isRunning=false;
 const LS={key:"wk2026.sportdbKey",proxy:"wk2026.sportdbProxy",poly:"wk2026.polyQuery",polyMode:"wk2026.polyMode",scoreMode:"wk2026.scoreMode",seed:"wk2026.variantSeed",sim:"wk2026.simulations",goal:"wk2026.goalBase",cache:"wk2026.sportdbCache",polyCache:"wk2026.polyCache"};
 function status(m){qs("#status").innerHTML=m||""}function fact(n){let r=1;for(let i=2;i<=n;i++)r*=i;return r}function poisson(l,k){return Math.exp(-l)*Math.pow(l,k)/fact(k)}
 function name(c){return tournament.teams[c]?.name||c}function rating(c){return elo[c]||tournament.teams[c]?.elo||1600}
-function save(){localStorage.setItem(LS.key,qs("#sportdbKey").value.trim());localStorage.setItem(LS.proxy,qs("#sportdbProxy").value.trim());localStorage.setItem(LS.poly,qs("#polyQuery").value.trim());localStorage.setItem(LS.polyMode,qs("#polyMode").value);localStorage.setItem(LS.scoreMode,qs("#scoreMode").value);localStorage.setItem(LS.seed,qs("#variantSeed").value);localStorage.setItem(LS.sim,qs("#simulations").value);localStorage.setItem(LS.goal,qs("#goalBase").value);status("Instellingen opgeslagen.")}
-function loadSettings(){qs("#sportdbKey").value=localStorage.getItem(LS.key)||"";qs("#sportdbProxy").value=localStorage.getItem(LS.proxy)||"";qs("#polyQuery").value=localStorage.getItem(LS.poly)||"world cup 2026 winner";qs("#polyMode").value=localStorage.getItem(LS.polyMode)||"search";qs("#scoreMode").value=localStorage.getItem(LS.scoreMode)||"likely";qs("#variantSeed").value=localStorage.getItem(LS.seed)||"2026";qs("#simulations").value=localStorage.getItem(LS.sim)||"1000";qs("#goalBase").value=localStorage.getItem(LS.goal)||"2.6"}
+function save(){
+  localStorage.setItem(LS.key, getVal("#sportdbKey","").trim());
+  localStorage.setItem(LS.proxy, getVal("#sportdbProxy","").trim());
+  localStorage.setItem(LS.poly, getVal("#polyQuery","").trim());
+  localStorage.setItem(LS.polyMode, getVal("#polyMode","search"));
+  localStorage.setItem(LS.scoreMode, getVal("#scoreMode","likely"));
+  localStorage.setItem(LS.seed, getVal("#variantSeed","2026"));
+  localStorage.setItem(LS.sim, getVal("#simulations","1000"));
+  localStorage.setItem(LS.goal, getVal("#goalBase","2.6"));
+  status("Instellingen opgeslagen.");
+}
+function loadSettings(){
+  setVal("#sportdbKey", localStorage.getItem(LS.key)||"");
+  setVal("#sportdbProxy", localStorage.getItem(LS.proxy)||"");
+  setVal("#polyQuery", localStorage.getItem(LS.poly)||"world cup 2026 winner");
+  setVal("#polyMode", localStorage.getItem(LS.polyMode)||"search");
+  setVal("#scoreMode", localStorage.getItem(LS.scoreMode)||"likely");
+  setVal("#variantSeed", localStorage.getItem(LS.seed)||"2026");
+  setVal("#simulations", localStorage.getItem(LS.sim)||"1000");
+  setVal("#goalBase", localStorage.getItem(LS.goal)||"2.6");
+}
 async function loadData(){const[t,e]=await Promise.all([fetch("data/world-cup-2026.json").then(r=>r.json()),fetch("data/elo.json").then(r=>r.json())]);tournament=t;elo=e.ratings||{}}
 function norm(s){return String(s||"").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-z0-9]+/g," ").trim()}
 function code(v){if(!v)return null;let raw=String(v).trim().toUpperCase();if(tournament.teams[raw])return raw;let n=norm(v);for(const[c,info]of Object.entries(tournament.teams)){if(norm(info.name)===n)return c;if((info.aliases||[]).map(norm).includes(n))return c}return null}
@@ -100,8 +121,8 @@ async function fetchPolyMarkets(mode,q){
 }
 async function loadPolymarket(){
   polyMarkets=[];polyTeamPrices={};polyMatchMarkets={};
-  let q=qs("#polyQuery").value.trim();
-  let mode=qs("#polyMode").value||"search";
+  let q=getVal("#polyQuery","").trim();
+  let mode=getVal("#polyMode","search");
   if(!q)return;
   let c=JSON.parse(localStorage.getItem(LS.polyCache)||"null"),now=Date.now();
   if(c&&c.q===q&&c.mode===mode&&now-c.ts<300000){polyMarkets=c.markets||[];polyTeamPrices=c.prices||{};polyMatchMarkets=c.matchMarkets||{};return}
@@ -144,14 +165,14 @@ function seededRandom(seed){
 }
 function sampleScoreSeeded(home,away,matchId,knockout=false){
   const rows=matrix(home,away,knockout);
-  const seedBase=Number(qs("#variantSeed").value||2026);
+  const seedBase=Number(getVal("#variantSeed","2026")||2026);
   const rnd=seededRandom(hashString(`${seedBase}-${matchId}-${home}-${away}`));
   let r=rnd();
   for(const row of rows){r-=row.p;if(r<=0)return row}
   return rows.at(-1);
 }
 function displayScore(home,away,matchId,knockout=false){
-  const mode=qs("#scoreMode")?.value||"likely";
+  const mode=getVal("#scoreMode","likely");
   if(mode==="rounded"){
     const [xh,xa]=expGoals(home,away,knockout);
     return {hg:Math.max(0,Math.round(xh)),ag:Math.max(0,Math.round(xa)),p:null,mode};
@@ -207,7 +228,7 @@ function renderMarkets(){
     const pm = polyMatchMarkets[m.id];
     return `<tr><td>${m.group}</td><td>${name(m.home)} - ${name(m.away)}</td><td>${pm?"✅ gevonden":"N/A"}</td><td class=right>${pm?na(pm.home):"N/A"}</td><td class=right>${pm?na(pm.draw):"N/A"}</td><td class=right>${pm?na(pm.away):"N/A"}</td><td>${pm?.question||""}</td></tr>`;
   }).join("");
-  qs("#markets").innerHTML=`<div class=card><h2>Polymarket</h2><p class=muted>Modus: <code>${qs("#polyMode").value}</code> · Zoekterm/slug: <code>${qs("#polyQuery").value.trim()}</code>. Ontbrekende data wordt expliciet als <b>N/A</b> getoond.</p><h3>Wedstrijdmarkten</h3><table><thead><tr><th>Groep</th><th>Wedstrijd</th><th>Status</th><th class=right>Home</th><th class=right>Draw</th><th class=right>Away</th><th>Market</th></tr></thead><tbody>${matchRows}</tbody></table><h3>Teamprijzen toernooiwinst</h3><table><thead><tr><th>Team</th><th class=right>Market price</th></tr></thead><tbody>${Object.keys(tournament.teams).sort((a,b)=>(polyTeamPrices[b]??-1)-(polyTeamPrices[a]??-1)).map(t=>`<tr><td>${name(t)}</td><td class=right><b>${na(polyTeamPrices[t])}</b></td></tr>`).join("")}</tbody></table><h3>Gevonden markten</h3><table><thead><tr><th>Question</th><th>Slug</th></tr></thead><tbody>${polyMarkets.map(m=>`<tr><td>${m.question||m.title||""}</td><td>${m.slug||""}</td></tr>`).join("")||"<tr><td colspan=2>Geen markten gevonden.</td></tr>"}</tbody></table></div>`
+  qs("#markets").innerHTML=`<div class=card><h2>Polymarket</h2><p class=muted>Modus: <code>${qs("#polyMode").value}</code> · Zoekterm/slug: <code>${getVal("#polyQuery","").trim()}</code>. Ontbrekende data wordt expliciet als <b>N/A</b> getoond.</p><h3>Wedstrijdmarkten</h3><table><thead><tr><th>Groep</th><th>Wedstrijd</th><th>Status</th><th class=right>Home</th><th class=right>Draw</th><th class=right>Away</th><th>Market</th></tr></thead><tbody>${matchRows}</tbody></table><h3>Teamprijzen toernooiwinst</h3><table><thead><tr><th>Team</th><th class=right>Market price</th></tr></thead><tbody>${Object.keys(tournament.teams).sort((a,b)=>(polyTeamPrices[b]??-1)-(polyTeamPrices[a]??-1)).map(t=>`<tr><td>${name(t)}</td><td class=right><b>${na(polyTeamPrices[t])}</b></td></tr>`).join("")}</tbody></table><h3>Gevonden markten</h3><table><thead><tr><th>Question</th><th>Slug</th></tr></thead><tbody>${polyMarkets.map(m=>`<tr><td>${m.question||m.title||""}</td><td>${m.slug||""}</td></tr>`).join("")||"<tr><td colspan=2>Geen markten gevonden.</td></tr>"}</tbody></table></div>`
 }
 function renderData(){qs("#data").innerHTML=`<div class=card><h2>Databronnen</h2><p><b>Lokaal:</b> <code>data/world-cup-2026.json</code> en <code>data/elo.json</code>.</p><p><b>SportDB:</b> direct browser calls naar <code>${SPORTDB_URL}</code> geven meestal CORS. Gebruik een proxy URL, bijvoorbeeld een Cloudflare Worker.</p><p><b>Polymarket:</b> <code>${POLY_URL}</code>, zonder API-key. Ondersteunt search en exact slug.</p><p><b>Scoremodus:</b> meest waarschijnlijk, afgeronde xG of realistische variant met vaste seed.</p><p><b>Cache:</b> SportDB en Polymarket 5 minuten in <code>localStorage</code>.</p></div>`}
 async function run(){
@@ -221,7 +242,7 @@ async function run(){
     if(!tournament) await loadData();
     await loadSportDB();
     await loadPolymarket();
-    let n=Math.max(100,Math.min(50000,Number(qs("#simulations").value||1000))),
+    let n=Math.max(100,Math.min(50000,Number(getVal("#simulations","1000")||1000))),
       base=build("baseline"),actual=build("actual"),proj=build("projected"),
       kb=ko(base.standings),kp=ko(proj.standings);
     let old=liveMatches;

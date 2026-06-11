@@ -60,3 +60,8 @@ En probeert outcomes te matchen met teams in data/world-cup-2026.json.
 - Polymarket modus toegevoegd:
   - Search
   - Exact slug
+
+
+## V8.1
+
+Fix voor ontbrekende velden/cache: app crasht niet meer als browser nog oude HTML/controls heeft.
