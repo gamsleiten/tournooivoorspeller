@@ -1,91 +1,28 @@
-# WK 2026 Predictor V4
+# WK 2026 Voorspeller V9
 
-GitHub Pages app met:
-- lokale WK 2026 JSON
-- lokale Elo ratings
-- SportDB live data via hardcoded endpoint
-- Polymarket Gamma markets voor toernooiwinstkansen
-- baseline / werkelijk / projected standen
-- baseline en live/projected kampioenskansen
+Schone V9 codebase.
 
-## Upload
-Wis je repo en upload alleen de inhoud van deze ZIP.
+## Upload naar GitHub Pages
+Upload alleen deze bestanden/mappen naar je repo:
 
-## SportDB
-Vul je SportDB API-key in. Endpoint staat hardcoded:
-https://api.sportdb.dev/api/flashscore/football
+- index.html
+- app.js
+- styles.css
+- .nojekyll
+- data/world-cup-2026.json
+- data/elo.json
+
+## SportDB live data
+SportDB blokkeert browser-calls via CORS. Gebruik daarom `sportdb-worker.js` als Cloudflare Worker.
+
+1. Maak een Worker.
+2. Plak `sportdb-worker.js`.
+3. Vul je SportDB key in bij `SPORTDB_API_KEY`.
+4. Deploy.
+5. Plak de Worker URL in de app bij SportDB proxy URL.
 
 ## Polymarket
-Geen API-key nodig. Vul een zoekterm in, bijvoorbeeld:
-world cup 2026 winner
+Geen key nodig. Gebruik Search of Exact slug.
 
-De app zoekt via:
-https://gamma-api.polymarket.com/markets
-
-En probeert outcomes te matchen met teams in data/world-cup-2026.json.
-
-## V5
-
-- Toont expliciet N/A bij ontbrekende Polymarket-data.
-- Probeert ook wedstrijdmarkten te herkennen.
-- Tab Polymarket bevat per groepswedstrijd marktstatus en prijzen indien beschikbaar.
-
-## V6
-
-- Geen automatische berekening bij eerste paginalaad.
-- Eerst API-key invullen, daarna handmatig op Genereer klikken.
-- Genereer-knop wordt disabled tijdens berekenen.
-- Standaard simulaties verlaagd naar 1000 voor snelle start.
-
-
-## V7
-
-- SportDB direct-call uit browser uitgezet; dit gaf CORS.
-- Gebruik optioneel `sportdb-worker.js` als Cloudflare Worker proxy.
-- De app vraagt nu om SportDB API-key + SportDB proxy URL.
-- Groepswedstrijden tonen nu ook:
-  - expected goals
-  - modelkansen 1/X/2
-  - exacte score
-- De exacte score is de meest waarschijnlijke losse score, niet de gemiddelde uitkomst.
-
-
-## V8
-
-- Scoremodus toegevoegd:
-  - Meest waarschijnlijk
-  - Afgeronde xG
-  - Realistische variant
-- Variant seed toegevoegd, zodat de realistische variant stabiel blijft.
-- Polymarket modus toegevoegd:
-  - Search
-  - Exact slug
-
-
-## V8.1
-
-Fix voor ontbrekende velden/cache: app crasht niet meer als browser nog oude HTML/controls heeft.
-
-
-## V8.2
-
-- Scoremodus staat nu gegarandeerd zichtbaar in de controls bovenaan.
-- Header toont V8.2 zodat je ziet dat GitHub Pages de juiste versie serveert.
-
-
-## V8.3
-
-- In de Poulefase-tab staan wedstrijden niet meer onder elke groep.
-- Alle groepswedstrijden staan nu in één chronologische lijst op datum/tijd.
-
-
-## V8.4
-
-- Poulefase-tab toont eerst alle groepen.
-- Daaronder staan alle groepswedstrijden gegroepeerd per speeldag/datum.
-
-
-## V8.5
-
-- Desktop blijft tabellen tonen.
-- Mobiel toont wedstrijden als cards per wedstrijd.
+## Let op
+De WK 2026 data bevat placeholders. Werk `data/world-cup-2026.json` bij zodra teams/schema definitief zijn.

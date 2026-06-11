@@ -1,13 +1,51 @@
-<!doctype html><html lang="nl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>WK 2026 Voorspeller V8.5</title><link rel="stylesheet" href="styles.css"></head><body><header class="hero"><h1>WK 2026 Voorspeller <span class="version">V8.5</span></h1><p>Elo + Poisson + Monte Carlo, met optioneel SportDB live data en Polymarket kampioenskansen en wedstrijdmarkten.</p></header><main><section class="controls">
-      <label>SportDB API-key<input id="sportdbKey" type="password" placeholder="optioneel"></label>
-      <label>SportDB proxy URL<input id="sportdbProxy" type="text" placeholder="optioneel, Cloudflare Worker URL"></label>
-      <label>Polymarket modus<select id="polyMode"><option value="search">Search</option><option value="slug">Exact slug</option></select></label>
-      <label>Polymarket zoekterm/slug<input id="polyQuery" type="text" placeholder="world cup 2026 winner"></label>
-      <label>Scoremodus<select id="scoreMode"><option value="likely">Meest waarschijnlijk</option><option value="rounded">Afgeronde xG</option><option value="variant">Realistische variant</option></select></label>
-      <label>Variant seed<input id="variantSeed" type="number" value="2026"></label>
-      <label>Simulaties<input id="simulations" type="number" min="100" max="50000" step="100" value="1000"></label>
-      <label>Goals/wedstrijd<input id="goalBase" type="number" min="1.5" max="4" step="0.1" value="2.6"></label>
-      <button id="saveBtn">Opslaan</button>
-      <button id="runBtn">Genereer</button>
-      <button id="clearBtn" class="secondary">Cache wissen</button>
-    </section><div id="status" class="status"></div><nav class="tabs"><button class="tab active" data-tab="summary">Samenvatting</button><button class="tab" data-tab="groups">Poulefase</button><button class="tab" data-tab="knockout">Knock-out</button><button class="tab" data-tab="chances">Kansen</button><button class="tab" data-tab="markets">Polymarket</button><button class="tab" data-tab="data">Data</button></nav><section id="summary" class="tabPanel active"></section><section id="groups" class="tabPanel"></section><section id="knockout" class="tabPanel"></section><section id="chances" class="tabPanel"></section><section id="markets" class="tabPanel"></section><section id="data" class="tabPanel"></section></main><script src="app.js"></script></body></html>
+<!doctype html>
+<html lang="nl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>WK 2026 Voorspeller V9</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="hero">
+    <h1>WK 2026 Voorspeller <span class="version">V9</span></h1>
+    <p>Speeldagen-first dashboard met Elo, Poisson, Monte Carlo, Polymarket en optionele SportDB proxy.</p>
+  </header>
+
+  <main>
+    <section class="settings card">
+      <h2>Instellingen</h2>
+      <div class="controls">
+        <label>SportDB proxy URL<input id="sportdbProxy" type="text" placeholder="https://...workers.dev"></label>
+        <label>Polymarket modus<select id="polyMode"><option value="search">Search</option><option value="slug">Exact slug</option></select></label>
+        <label>Polymarket zoekterm/slug<input id="polyQuery" type="text" placeholder="world cup 2026 winner"></label>
+        <label>Scoremodus<select id="scoreMode"><option value="likely">Meest waarschijnlijk</option><option value="rounded">Afgeronde xG</option><option value="variant">Realistische variant</option></select></label>
+        <label>Variant seed<input id="variantSeed" type="number" value="2026"></label>
+        <label>Simulaties<input id="simulations" type="number" min="100" max="50000" step="100" value="1000"></label>
+        <label>Goals/wedstrijd<input id="goalBase" type="number" min="1.5" max="4" step="0.1" value="2.7"></label>
+        <button id="runBtn">Genereer</button>
+        <button id="clearBtn" class="secondary">Cache wissen</button>
+      </div>
+      <div id="status" class="status">Vul eventueel proxy/Polymarket in en klik op Genereer.</div>
+    </section>
+
+    <nav class="tabs">
+      <button class="tab active" data-tab="matchdays">Speeldagen</button>
+      <button class="tab" data-tab="groups">Groepen</button>
+      <button class="tab" data-tab="knockout">Knock-out</button>
+      <button class="tab" data-tab="chances">Kansen</button>
+      <button class="tab" data-tab="markets">Polymarket</button>
+      <button class="tab" data-tab="about">Model</button>
+    </nav>
+
+    <section id="matchdays" class="tabPanel active"></section>
+    <section id="groups" class="tabPanel"></section>
+    <section id="knockout" class="tabPanel"></section>
+    <section id="chances" class="tabPanel"></section>
+    <section id="markets" class="tabPanel"></section>
+    <section id="about" class="tabPanel"></section>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
