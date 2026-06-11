@@ -71,3 +71,21 @@ Fix voor ontbrekende velden/cache: app crasht niet meer als browser nog oude HTM
 
 - Scoremodus staat nu gegarandeerd zichtbaar in de controls bovenaan.
 - Header toont V8.2 zodat je ziet dat GitHub Pages de juiste versie serveert.
+
+
+## V8.3
+
+- In de Poulefase-tab staan wedstrijden niet meer onder elke groep.
+- Alle groepswedstrijden staan nu in één chronologische lijst op datum/tijd.
+
+
+## V8.4
+
+- Poulefase-tab toont eerst alle groepen.
+- Daaronder staan alle groepswedstrijden gegroepeerd per speeldag/datum.
+
+
+## V8.5
+
+- Desktop blijft tabellen tonen.
+- Mobiel toont wedstrijden als cards per wedstrijd.

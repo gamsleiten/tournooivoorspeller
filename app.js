@@ -206,14 +206,69 @@ function table(rows,title){return`<h3>${title}</h3><table><thead><tr><th>Team</t
 function na(v){return v===undefined||v===null||Number.isNaN(v)?'N/A':pct(v)}
 function pmDiff(pm,model){return pm===undefined||pm===null?'N/A':((pm-model)>=0?'+':'')+pct(pm-model)}
 function renderSummary(base,proj,kb,kp,mb,mp){let top=Object.entries(mp).sort((a,b)=>b[1].champion-a[1].champion).slice(0,10);qs("#summary").innerHTML=`<div class=grid><div class=card><h2>Baseline winnaar</h2><p class=winner style="font-size:30px">${name(kb.winner)}</p><p class=muted>Vooraf-model zonder echte uitslagen.</p></div><div class=card><h2>Live/projected winnaar</h2><p class=winner style="font-size:30px">${name(kp.winner)}</p><p class=muted>Echte uitslagen + voorspelde rest.</p>${top.map(([t,r])=>`<p>${name(t)} <span class=pill>${pct(r.champion)}</span> ${`<span class=pill>PM ${na(polyTeamPrices[t])}</span>`}</p><div class=bar><span style="width:${r.champion*100}%"></span></div>`).join("")}</div></div>`}
+function dateKeyForMatch(m){
+  const raw = m.live?.date || m.date;
+  const d = new Date(raw);
+  if(Number.isNaN(d.getTime())) return "Datum onbekend";
+  return d.toLocaleDateString("nl-NL", {
+    timeZone: "Europe/Amsterdam",
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+    year: "numeric"
+  });
+}
+
 function renderGroups(base,actual,proj){
-  let by={};proj.predictions.forEach(m=>(by[m.group]||=[]).push(m));
-  qs("#groups").innerHTML=Object.keys(tournament.groups).map(g=>`<div class=card><h2>Groep ${g}</h2><div class=grid><div>${table(base.standings[g],"Baseline")}</div><div>${table(actual.standings[g],"Werkelijk")}</div><div>${table(proj.standings[g],"Projected")}</div></div><h3>Wedstrijden</h3><table><thead><tr><th>Datum CEST</th><th>Wedstrijd</th><th>Stad</th><th>Stadion</th><th>Status</th><th class=right>xG</th><th class=right>1/X/2 model</th><th class=right>Score</th><th class=right>Werkelijk</th><th class=right>Gebruikt</th><th>Polymarket</th></tr></thead><tbody>${(by[g]||[]).map(m=>{
-    let l=m.live,real=l?.finished&&l.hg!==null&&l.ag!==null?`${l.hg}-${l.ag}`:"",used=m.source==="actual"?real:`${m.hg}-${m.ag}`;
-    let pm=polyMatchMarkets[m.id];
-    let pmText=pm?`✅ ${name(m.home)} ${na(pm.home)} / X ${na(pm.draw)} / ${name(m.away)} ${na(pm.away)}`:"N/A";
-    return`<tr><td>${dt(l?.date||m.date)}</td><td>${name(m.home)} - ${name(m.away)}</td><td>${l?.city||m.city||""}</td><td>${l?.venue||m.venue||""}</td><td>${l?.status||"scheduled"}</td><td class=right>${m.odds.xh.toFixed(1)}-${m.odds.xa.toFixed(1)}</td><td class=right>${pct(m.odds.homeWin)} / ${pct(m.odds.draw)} / ${pct(m.odds.awayWin)}</td><td class=right>${m.predHg}-${m.predAg}</td><td class=right>${real}</td><td class=right><b>${used}</b> <span class=pill>${m.source}</span></td><td>${pmText}</td></tr>`
-  }).join("")}</tbody></table></div>`).join("")
+  const groupCards = Object.keys(tournament.groups).map(g=>`<div class=card><h2>Groep ${g}</h2><div class=grid><div>${table(base.standings[g],"Baseline")}</div><div>${table(actual.standings[g],"Werkelijk")}</div><div>${table(proj.standings[g],"Projected")}</div></div></div>`).join("");
+
+  const matches = [...proj.predictions].sort((a,b)=>{
+    const da = new Date(a.live?.date || a.date).getTime();
+    const db = new Date(b.live?.date || b.date).getTime();
+    return (Number.isNaN(da)?0:da) - (Number.isNaN(db)?0:db);
+  });
+
+  const byDay = {};
+  matches.forEach(m => {
+    const key = dateKeyForMatch(m);
+    (byDay[key] ||= []).push(m);
+  });
+
+  const daySections = Object.entries(byDay).map(([day, dayMatches]) => {
+    const rows = dayMatches.map(m=>{
+      let l=m.live;
+      let real=l?.finished&&l.hg!==null&&l.ag!==null?`${l.hg}-${l.ag}`:"";
+      let used=m.source==="actual"?real:`${m.hg}-${m.ag}`;
+      let pm=polyMatchMarkets[m.id];
+      let pmText=pm?`✅ ${name(m.home)} ${na(pm.home)} / X ${na(pm.draw)} / ${name(m.away)} ${na(pm.away)}`:"N/A";
+      return`<tr><td>${dt(l?.date||m.date)}</td><td>${m.group}</td><td>${name(m.home)} - ${name(m.away)}</td><td>${l?.city||m.city||""}</td><td>${l?.venue||m.venue||""}</td><td>${l?.status||"scheduled"}</td><td class=right>${m.odds.xh.toFixed(1)}-${m.odds.xa.toFixed(1)}</td><td class=right>${pct(m.odds.homeWin)} / ${pct(m.odds.draw)} / ${pct(m.odds.awayWin)}</td><td class=right>${m.predHg}-${m.predAg}</td><td class=right>${real}</td><td class=right><b>${used}</b> <span class=pill>${m.source}</span></td><td>${pmText}</td></tr>`
+    }).join("");
+
+    const cards = dayMatches.map(m=>{
+      let l=m.live;
+      let real=l?.finished&&l.hg!==null&&l.ag!==null?`${l.hg}-${l.ag}`:"N/A";
+      let used=m.source==="actual"?real:`${m.hg}-${m.ag}`;
+      let pm=polyMatchMarkets[m.id];
+      let pmText=pm?`${name(m.home)} ${na(pm.home)} / X ${na(pm.draw)} / ${name(m.away)} ${na(pm.away)}`:"N/A";
+      return `<div class="matchCard">
+        <div class="matchCardTop"><span class="pill">Groep ${m.group}</span><span>${dt(l?.date||m.date)}</span></div>
+        <h3>${name(m.home)} - ${name(m.away)}</h3>
+        <div class="matchMeta">${l?.city||m.city||""}${(l?.city||m.city)&&(l?.venue||m.venue)?" · ":""}${l?.venue||m.venue||""}</div>
+        <div class="matchGrid">
+          <div><span>xG</span><b>${m.odds.xh.toFixed(1)}-${m.odds.xa.toFixed(1)}</b></div>
+          <div><span>1/X/2</span><b>${pct(m.odds.homeWin)} / ${pct(m.odds.draw)} / ${pct(m.odds.awayWin)}</b></div>
+          <div><span>Score</span><b>${m.predHg}-${m.predAg}</b></div>
+          <div><span>Werkelijk</span><b>${real}</b></div>
+          <div><span>Gebruikt</span><b>${used}</b></div>
+          <div><span>Polymarket</span><b>${pmText}</b></div>
+        </div>
+      </div>`;
+    }).join("");
+
+    return `<div class=card><h2>${day}</h2><div class="desktopTable"><table><thead><tr><th>Tijd CEST</th><th>Groep</th><th>Wedstrijd</th><th>Stad</th><th>Stadion</th><th>Status</th><th class=right>xG</th><th class=right>1/X/2 model</th><th class=right>Score</th><th class=right>Werkelijk</th><th class=right>Gebruikt</th><th>Polymarket</th></tr></thead><tbody>${rows}</tbody></table></div><div class="mobileCards">${cards}</div></div>`;
+  }).join("");
+
+  qs("#groups").innerHTML = `${groupCards}<div class=card><h2>Wedstrijden per speeldag</h2><p class=muted>Alle groepswedstrijden staan hieronder op datum/tijd, los van de groepsstand-tabellen.</p></div>${daySections}`;
 }
 function renderKo(kb,kp){let stages=["Round of 32","Round of 16","Quarter-final","Semi-final","Final"],r=(k,title)=>`<div class=card><h2>${title}</h2>${stages.map(s=>`<h3>${s}</h3><table><tbody>${k.matches.filter(m=>m.stage===s).map(m=>`<tr><td>${m.id}</td><td>${name(m.homeTeam)} - ${name(m.awayTeam)}</td><td class=right><b>${m.hg}-${m.ag}</b></td><td class=winner>${name(m.winner)}</td></tr>`).join("")}</tbody></table>`).join("")}</div>`;qs("#knockout").innerHTML=`<div class=grid>${r(kb,"Baseline bracket")}${r(kp,"Live/projected bracket")}</div>`}
 function renderChances(mb,mp){

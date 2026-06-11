@@ -2,3 +2,23 @@ body{margin:0;font-family:system-ui,Segoe UI,Arial,sans-serif;background:#f6f7fb
 button:disabled{opacity:.55;cursor:not-allowed}
 
 #sportdbProxy{min-width:320px}.version{font-size:16px;background:rgba(255,255,255,.18);padding:4px 8px;border-radius:999px;vertical-align:middle}
+
+.mobileCards{display:none}
+.matchCard{border:1px solid #d9deea;border-radius:14px;padding:14px;margin:12px 0;background:#fff}
+.matchCardTop{display:flex;justify-content:space-between;gap:10px;color:#667085;font-size:12px}
+.matchCard h3{margin:10px 0 4px;font-size:18px}
+.matchMeta{color:#667085;font-size:13px;margin-bottom:12px}
+.matchGrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.matchGrid div{background:#f6f7fb;border:1px solid #e8ecf7;border-radius:10px;padding:9px}
+.matchGrid span{display:block;color:#667085;font-size:12px;margin-bottom:4px}
+.matchGrid b{font-size:13px}
+@media (max-width: 760px){
+  main{padding:14px}
+  .hero{padding:22px 16px}
+  .hero h1{font-size:26px}
+  .controls{align-items:stretch}
+  label,input,select,button{width:100%;min-width:0}
+  .desktopTable{display:none}
+  .mobileCards{display:block}
+  .grid{grid-template-columns:1fr}
+}
